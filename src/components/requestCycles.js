@@ -11,19 +11,78 @@ class RequestCycles extends Component {
     }
 
     render() {
-        const requestData = this.props;
+        const requestData = this.props.requestData;
         let categoryArray = [];
         let numberOfRequests = [];
         let timePerCycle = [];
         let i = 0;
 
-        requestData.requestData.forEach((e) => {
+        requestData.forEach((e) => {
             categoryArray.push(++i);
             numberOfRequests.push(e.requests);
             timePerCycle.push(e.totalElapsedTime);
         })
 
-        const options = {
+        let totalCycles = requestData.length;
+
+        let highest = requestData.find((obj) => { return obj.totalElapsedTime === Math.max(...requestData.map(c => c.totalElapsedTime)) });
+        let lowest = requestData.find((obj) => { return obj.totalElapsedTime === Math.min(...requestData.map(c => c.totalElapsedTime)) });
+        const randomRequestCycle = requestData.reduce((accumulator, current) => {
+            if (current !== highest || current !== lowest) {
+                accumulator.push(current)
+            }
+            return accumulator
+        }, [])[Math.floor(Math.random() * (requestData.length - 2))]
+
+        let totalChartTime = highest.totalElapsedTime + lowest.totalElapsedTime + randomRequestCycle.totalElapsedTime;
+
+
+
+        console.log(randomRequestCycle)
+        const pieOptions = {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Trends'
+            },
+            subtitle: {
+                text: `Total request cycles ${totalCycles} `
+            },
+
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>'
+                    }
+                }
+            },
+            series: [{
+                name: 'Ratio to 3 cycles',
+                colorByPoint: true,
+                data: [{
+                    name: `${highest.requests} requests per cycle took ${highest.totalElapsedTime} ms`,
+                    y: Math.floor(highest.totalElapsedTime / totalChartTime * 100),
+                    sliced: true,
+                    selected: true
+                }, {
+                    name: `${randomRequestCycle.requests} requests per cycle took ${randomRequestCycle.totalElapsedTime} ms`,
+                    y: Math.floor(randomRequestCycle.totalElapsedTime / totalChartTime * 100)
+                },
+                {
+                    name: `${lowest.requests} requests per cycle took ${lowest.totalElapsedTime} ms`,
+                    y: Math.floor(lowest.totalElapsedTime / totalChartTime * 100)
+                }]
+            }]
+        };
+
+        const lineOptions = {
             title: {
                 text: 'Concurrent Requests',
                 align: 'left'
@@ -137,7 +196,7 @@ class RequestCycles extends Component {
         i = 0;
         const dataArray = [];
 
-        requestData.requestData.forEach(e => {
+        requestData.forEach(e => {
             let data = {
                 id: ++i, requests: e.requests, totalElapsedTime: e.totalElapsedTime, averageTime: Math.round(e.totalElapsedTime / e.requests)
             }
@@ -150,7 +209,9 @@ class RequestCycles extends Component {
             <div>
                 <h3>Concurrent Requests</h3>
                 <div>
-                    <HighchartsReact highcharts={Highcharts} options={options} />
+                    <HighchartsReact highcharts={Highcharts} options={pieOptions} />
+                    <hr></hr>
+                    <HighchartsReact highcharts={Highcharts} options={lineOptions} />
                     <hr></hr>
                     <h4 style={{ textAlign: 'center' }}>All Requests</h4>
                     <div>
