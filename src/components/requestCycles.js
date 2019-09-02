@@ -35,10 +35,6 @@ class RequestCycles extends Component {
         }, [])[Math.floor(Math.random() * (requestData.length - 2))]
 
         let totalChartTime = highest.totalElapsedTime + lowest.totalElapsedTime + randomRequestCycle.totalElapsedTime;
-
-
-
-        console.log(randomRequestCycle)
         const pieOptions = {
             chart: {
                 plotBackgroundColor: null,
@@ -177,19 +173,23 @@ class RequestCycles extends Component {
         const columns = [
             {
                 Header: '#',
-                accessor: 'id'
+                accessor: 'id',
+                style: { textAlign: 'center' }
             },
             {
                 Header: 'Total requests Made',
-                accessor: 'requests'
+                accessor: 'requests',
+                style: { textAlign: 'center' }
             },
             {
                 Header: 'Total time per cycle (ms)',
-                accessor: 'totalElapsedTime'
+                accessor: 'totalElapsedTime',
+                style: { textAlign: 'center' }
             },
             {
                 Header: 'Average time per cycle (ms)',
-                accessor: 'averageTime'
+                accessor: 'averageTime',
+                style: { textAlign: 'center' }
             }
 
         ]
@@ -207,7 +207,7 @@ class RequestCycles extends Component {
 
         return (
             <div>
-                <h3>Concurrent Requests</h3>
+                <h3>Cycles</h3>
                 <div>
                     <HighchartsReact highcharts={Highcharts} options={pieOptions} />
                     <hr></hr>
